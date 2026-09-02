@@ -6,27 +6,24 @@ use Illuminate\Http\Request;
 
 class HRCalculatorController extends Controller
 {
- public function getSalaryInfo($employmentType, $positionTier)
- {
-    if($employmentType == "COS")
+    public function getSalaryInfo($employmentType, $positionTier)
     {
-        return [
+
+        if ($employmentType == "COS") {
+            return [
                 "baseSalary" => 18000,
                 "sss" => 0,
                 "philhealth" => 0,
                 "pagibig" => 0,
-        ];
-    }
-   elseif ($employmentType == "Regular" && $positionTier == "Junior")
-   {
+            ];
+        } elseif ($employmentType == "Regular" && $positionTier == "Junior") {
             return [
                 "baseSalary" => 25000,
                 "sss" => 1125,
                 "philhealth" => 625,
                 "pagibig" => 200,
             ];
-   }
-   elseif ($employmentType == "Regular" && $positionTier == "Senior") {
+        } elseif ($employmentType == "Regular" && $positionTier == "Senior") {
             return [
                 "baseSalary" => 40000,
                 "sss" => 1800,
@@ -41,7 +38,7 @@ class HRCalculatorController extends Controller
                 "pagibig" => 0,
             ];
         }
- }
+    }
 
     public function getDaysPresent($daysAbsent)
     {
@@ -99,7 +96,6 @@ class HRCalculatorController extends Controller
         $sss = $salaryInfo['sss'];
         $philhealth = $salaryInfo['philhealth'];
         $pagibig = $salaryInfo['pagibig'];
-
         $daysPresent = $this->getDaysPresent($daysAbsent);
         $dailyRate = $this->getDailyRate($baseSalary);
         $hourlyRate = $this->getHourlyRate($dailyRate);
