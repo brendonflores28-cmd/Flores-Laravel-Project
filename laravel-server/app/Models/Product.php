@@ -17,4 +17,19 @@ class Product extends Model
         'quantity',
         'status',
     ];
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function orderProducts()
+    {
+        return $this->hasMany(OrderProduct::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }
+    

@@ -5,9 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HRCalculatorController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Ecommerce\AuthController;
-use App\Http\Controllers\Ecommerce\CategoryController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Ecommerce\OrderController;
 use App\Http\Controllers\Ecommerce\ProductController as EcommerceProductController;
+
+Route::get('/categories', [CategoryController::class, 'index']);
 
 Route::post('/payroll/calculate', [HRCalculatorController::class, 'calculate']);
 Route::apiResource('products', ProductController::class);

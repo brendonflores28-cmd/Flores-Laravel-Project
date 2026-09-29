@@ -12,7 +12,7 @@ class CategoryController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Category::paginate(15));
+        return response()->json(Category::all());
     }
 
     public function show(Category $category): JsonResponse

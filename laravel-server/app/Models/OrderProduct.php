@@ -9,4 +9,14 @@ class OrderProduct extends Model
 {
     /** @use HasFactory<\Database\Factories\OrderProductFactory> */
     use HasFactory;
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
