@@ -1,16 +1,8 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getPost, storePost } from '../../api/post';
 import './styles/post.css';
 import PostCard from './PostCard';
-
-function extractPosts(data) {
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data?.data)) return data.data;
-    if (Array.isArray(data?.data?.data)) return data.data.data;
-    if (Array.isArray(data?.posts)) return data.posts;
-    return [];
-}
 
 export default function Post() {
     const [posts, setPosts] = useState([]);
@@ -22,13 +14,11 @@ export default function Post() {
         const fetchPosts = async () => {
             try {
                 const response = await getPost();
-                setPosts(extractPosts(response.data));
+                setPosts(response.data.data || response.data);
             } catch (err) {
                 console.error("Failed to load posts", err);
-                setError('Failed to load posts: ' + err.message);
             }
         };
-
         fetchPosts();
     }, []);
 
@@ -38,72 +28,75 @@ export default function Post() {
         }
     }, [message, error]);
 
+    const submit = async (e) => {
+        e.preventDefault();
 
-const submit = async (e) => {
-    e.preventDefault();
+        if (!message.trim()) {
+            setError('Post cannot be empty');
+            return;
+        }
 
-    if (!message.trim()) {
-        setError('Post cannot be empty');
-        return;
-    }
+        setProcessing(true);
+        setError('');
 
-    setProcessing(true);
-    setError('');
+        try {
+            const response = await storePost({ message });
 
-    try {
-        const response = await storePost({ message });
+            const newPost = response.data.data || response.data;
 
-        const newPost = response.data.data || response.data;
+            setPosts((prevPosts) => [newPost, ...prevPosts]);
 
-        setPosts((prevPosts) => [newPost, ...prevPosts]);
-
-        setMessage('');
-    } catch (err) {
-        const errMsg =
-            err.response?.data?.message ||
-            err.message ||
-            'Failed to share post. Please try again.';
-
-        setError(errMsg);
-    } finally {
-        setProcessing(false);
-    }
-};
-
+            setMessage('');
+        } catch (err) {
+            const errMsg = err.response?.data?.message || 'Failed to share post. Please try again.';
+            setError(errMsg);
+        } finally {
+            setProcessing(false);
+        }
+    };
 
     return (
         <div className="post-container">
-            <h1>My Posts</h1>
+            <div className="post-card">
+                <form onSubmit={submit} className="post-form">
+                    <textarea
+                        value={message}
+                        placeholder="What is happening?!"
+                        className="post-textarea"
+                        onChange={(e) => setMessage(e.target.value)}
+                        disabled={processing}
+                    ></textarea>
 
-            <form onSubmit={submit} className="post-form">
-                <textarea
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="What's on your mind?"
-                    rows="4"
-                />
+                    {error && (
+                        <div className="post-error">
+                            {error}
+                        </div>
+                    )}
 
-                {error && (
-                    <p className="post-error">{error}</p>
-                )}
+                    <div className="post-footer">
+                        <button
+                            type="submit"
+                            className="post-submit-btn"
+                            disabled={processing || !message.trim()}
+                        >
+                            {processing ? 'Posting...' : 'Post'}
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-                <button type="submit" disabled={processing}>
-                    {processing ? 'Posting...' : 'Create Post'}
-                </button>
-            </form>
-
-            <h2>Recent Posts</h2>
-
-            <div className="post-list">
-                {posts.length === 0 ? (
-                    <p>No posts available.</p>
-                ) : (
-                    posts.map((post, index) => (
+            <div className="post-feed-list">
+                {posts.length > 0 ? (
+                    posts.map((post) => (
                         <PostCard
-                            key={post.id ?? index}
+                            key={post.id || Math.random()}
                             post={post}
                         />
                     ))
+                ) : (
+                    <div className="post-empty-state">
+                        No posts shared yet.
+                    </div>
                 )}
             </div>
         </div>
